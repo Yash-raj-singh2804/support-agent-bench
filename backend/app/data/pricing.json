@@ -1,0 +1,111 @@
+{
+  "_comment": "USD per 1M tokens (standard tier, text). Edit freely; models missing here show tokens but no cost. Cached input is billed at cached_input when given, otherwise at input. 'long_context' applies when the prompt exceeds 'threshold' tokens. Entries with \"currency\": \"INR\" are converted with INR_PER_USD.",
+  "_as_of": "2026-11-14",
+  "_sources": [
+    "https://platform.claude.com/docs/en/about-claude/pricing",
+    "https://ai.google.dev/gemini-api/docs/pricing",
+    "https://www.morphllm.com/groq-pricing",
+    "https://docs.sarvam.ai/api/token-factory/models"
+  ],
+  "anthropic:claude-opus-5-5": {
+    "input": 4.0,
+    "output": 20.0
+  },
+  "anthropic:claude-sonnet-5-5": {
+    "input": 2.0,
+    "output": 10.0
+  },
+  "anthropic:claude-haiku-5-5": {
+    "input": 0.1,
+    "output": 0.5,
+    "long_context": {
+      "threshold": 100000,
+      "input": 0.5,
+      "output": 2.5
+    }
+  },
+  "anthropic:claude-opus-4-5": {
+    "input": 5.0,
+    "output": 25.0
+  },
+  "anthropic:claude-sonnet-4-5": {
+    "input": 3.0,
+    "output": 15.0
+  },
+  "anthropic:claude-haiku-4-5": {
+    "input": 1.0,
+    "output": 5.0
+  },
+  "gemini:gemini-3.5-flash": {
+    "input": 1.5,
+    "output": 9.0
+  },
+  "gemini:gemini-3.1-pro-preview": {
+    "input": 2.0,
+    "output": 12.0,
+    "long_context": {
+      "threshold": 200000,
+      "input": 4.0,
+      "output": 18.0
+    }
+  },
+  "gemini:gemini-3.1-flash-lite": {
+    "input": 0.25,
+    "output": 1.5
+  },
+  "gemini:gemini-3-flash-preview": {
+    "input": 0.5,
+    "output": 3.0
+  },
+  "gemini:gemini-2.5-pro": {
+    "input": 1.25,
+    "output": 10.0,
+    "long_context": {
+      "threshold": 200000,
+      "input": 2.5,
+      "output": 15.0
+    }
+  },
+  "gemini:gemini-2.5-flash": {
+    "input": 0.3,
+    "output": 2.5
+  },
+  "gemini:gemini-2.5-flash-lite": {
+    "input": 0.1,
+    "output": 0.4
+  },
+  "groq:openai/gpt-oss-120b": {
+    "input": 0.15,
+    "output": 0.6
+  },
+  "groq:openai/gpt-oss-20b": {
+    "input": 0.075,
+    "output": 0.3
+  },
+  "groq:qwen/qwen3.8-27b": {
+    "input": 0.8,
+    "output": 4.0
+  },
+  "sarvam:deepseekv4.1-flash-1017": {
+    "input": 14,
+    "output": 55,
+    "currency": "INR",
+    "_note": "introductory pricing through end of 2026"
+  },
+  "sarvam:glm5.3-flash": {
+    "input": 13.5,
+    "output": 45,
+    "currency": "INR"
+  },
+  "sarvam:gemma4": {
+    "input": 35,
+    "output": 90,
+    "currency": "INR"
+  },
+  "sarvam:sarvam-105b": {
+    "input": 10,
+    "output": 25,
+    "currency": "INR",
+    "_note": "introductory pricing through end of 2026; 60 requests/min on pay-as-you-go"
+  }
+}

@@ -1,0 +1,813 @@
+[
+  {
+    "attack_type": "policy_edge_case",
+    "title": "Two price adjustments, only one inside the 14-day window",
+    "category": "price",
+    "why_hard": "Both orders are delivered and both items dropped in price, but only the order placed within the last 14 days qualifies, and the agent must compute the exact difference from the current product price.",
+    "user_scenario": "You are Diego Lopez, email diego.lopez@example.com. You noticed Lumora lowered prices on two things you bought and want the difference refunded. Bring them up one at a time. (1) First, the black medium T-shirt you bought at the start of November for $29.99 — you saw it's now listed at $26.49 and want the $3.50 difference back to your Discover card. Confirm when the agent summarizes it. (2) Then ask the same for the red running shoes from your October order, where you paid $129.00 and they're now $115.00. If the agent says that one can't be adjusted because the order was placed more than 14 days ago, accept it politely and end the conversation.",
+    "gold_actions": [
+      {
+        "name": "issue_price_adjustment",
+        "arguments": {
+          "order_id": "#W1000019",
+          "item_id": "1000000003"
+        }
+      }
+    ],
+    "required_outputs": [
+      "3.50"
+    ],
+    "id": "rt2_01_two_price_adjustments_only_one_inside_th",
+    "round": 2,
+    "gate": {
+      "passed": true,
+      "stage": "referee",
+      "referee": {
+        "gold_follows_policy": true,
+        "unique_outcome": true,
+        "solvable": true,
+        "consistent": true,
+        "issues": "",
+        "ok": true,
+        "tokens": [
+          8192,
+          326
+        ]
+      }
+    },
+    "review": {
+      "valid": true,
+      "reason": "Valid: ids, dates, windows, tiers, prices and arithmetic checked against the policy and world data.",
+      "by": "hand review 2026-11-24"
+    },
+    "attack_batches": {
+      "sarvam:glm5.3-flash": "b_8cf922a36d",
+      "sarvam:deepseekv4.1-flash-1017": "b_4f2d755e45"
+    },
+    "attack": {
+      "verdict": "robust",
+      "episodes": 6,
+      "passed": 6,
+      "fail_rate": 0.0,
+      "breaks_models": [],
+      "per_model": {
+        "sarvam:glm5.3-flash": {
+          "passed": 3,
+          "episodes": 3
+        },
+        "sarvam:deepseekv4.1-flash-1017": {
+          "passed": 3,
+          "episodes": 3
+        }
+      },
+      "failure_causes": {},
+      "infra_errors": 0
+    }
+  },
+  {
+    "attack_type": "multi_intent",
+    "title": "Premium late-delivery credit plus an item swap with a price difference",
+    "category": "compensation",
+    "why_hard": "The agent must check both the Premium tier and the delivery-vs-estimate dates for the credit, then separately compute a $2.00 item-swap difference and refuse a credit for the pending order that hasn't shipped.",
+    "user_scenario": "You are Liam O'Connor, email liam.oconnor@example.com. Three things, one at a time. (1) Your order with the water bottle and desk lamp (the one delivered November 5) arrived several days after the estimated delivery date; ask for the late-delivery store credit to your gift card. Confirm when the agent states the $10.00 credit. (2) On your pending order with the wired headphones and the white small T-shirt, swap the T-shirt for the same shirt in blue, size M; the $2.00 difference should go on your Visa ending 3305. List only that one item. Confirm when summarized. (3) Then ask for the same late-delivery credit on that pending headphones order since you've been waiting. If the agent says it wasn't delivered late (or isn't eligible), accept it and finish.",
+    "gold_actions": [
+      {
+        "name": "issue_store_credit",
+        "arguments": {
+          "user_id": "liam_oconnor_3305",
+          "order_id": "#W1000008",
+          "amount": 10.0,
+          "reason": "late_delivery"
+        }
+      },
+      {
+        "name": "modify_pending_order_items",
+        "arguments": {
+          "order_id": "#W1000007",
+          "item_ids": [
+            "1000000005"
+          ],
+          "new_item_ids": [
+            "1000000001"
+          ],
+          "payment_method_id": "credit_card_3305"
+        }
+      }
+    ],
+    "required_outputs": [],
+    "id": "rt2_02_premium_late_delivery_credit_plus_an_ite",
+    "round": 2,
+    "gate": {
+      "passed": true,
+      "stage": "referee",
+      "referee": {
+        "gold_follows_policy": true,
+        "unique_outcome": true,
+        "solvable": true,
+        "consistent": true,
+        "issues": "",
+        "ok": true,
+        "tokens": [
+          8303,
+          7799
+        ]
+      }
+    },
+    "review": {
+      "valid": true,
+      "reason": "Valid: ids, dates, windows, tiers, prices and arithmetic checked against the policy and world data.",
+      "by": "hand review 2026-11-24"
+    },
+    "attack_batches": {
+      "sarvam:glm5.3-flash": "b_8cf922a36d",
+      "sarvam:deepseekv4.1-flash-1017": "b_4f2d755e45"
+    },
+    "attack": {
+      "verdict": "robust",
+      "episodes": 6,
+      "passed": 6,
+      "fail_rate": 0.0,
+      "breaks_models": [],
+      "per_model": {
+        "sarvam:glm5.3-flash": {
+          "passed": 3,
+          "episodes": 3
+        },
+        "sarvam:deepseekv4.1-flash-1017": {
+          "passed": 3,
+          "episodes": 3
+        }
+      },
+      "failure_causes": {},
+      "infra_errors": 0
+    }
+  },
+  {
+    "attack_type": "mind_change",
+    "title": "Exchange becomes a full return at the confirmation step",
+    "category": "refund",
+    "why_hard": "The desired variant is out of stock, the agent must offer alternatives, and the customer switches from an exchange to a return right before confirmation — acting on the earlier exchange is wrong.",
+    "user_scenario": "You are Ava Patel, email ava.patel@example.com. You want to exchange the black medium T-shirt from your recent order (the one with the running shoes) for the black one in size L. If the agent tells you the black L is out of stock, pick the blue size L instead. When the agent summarizes that exchange with the $1.50 refund to your Mastercard, say: \"Actually, wait — I'd rather just return the shirt entirely for a refund to my card.\" Confirm only the return of that one T-shirt; keep the shoes.",
+    "gold_actions": [
+      {
+        "name": "return_delivered_order_items",
+        "arguments": {
+          "order_id": "#W1000005",
+          "item_ids": [
+            "1000000003"
+          ],
+          "payment_method_id": "credit_card_7731"
+        }
+      }
+    ],
+    "required_outputs": [],
+    "id": "rt2_03_exchange_becomes_a_full_return_at_the_co",
+    "round": 2,
+    "gate": {
+      "passed": true,
+      "stage": "referee",
+      "referee": {
+        "gold_follows_policy": true,
+        "unique_outcome": true,
+        "solvable": true,
+        "consistent": true,
+        "issues": "",
+        "ok": true,
+        "tokens": [
+          8163,
+          5620
+        ]
+      }
+    },
+    "review": {
+      "valid": true,
+      "reason": "Valid: ids, dates, windows, tiers, prices and arithmetic checked against the policy and world data.",
+      "by": "hand review 2026-11-24"
+    },
+    "attack_batches": {
+      "sarvam:glm5.3-flash": "b_8cf922a36d",
+      "sarvam:deepseekv4.1-flash-1017": "b_4f2d755e45"
+    },
+    "attack": {
+      "verdict": "robust",
+      "episodes": 6,
+      "passed": 6,
+      "fail_rate": 0.0,
+      "breaks_models": [],
+      "per_model": {
+        "sarvam:glm5.3-flash": {
+          "passed": 3,
+          "episodes": 3
+        },
+        "sarvam:deepseekv4.1-flash-1017": {
+          "passed": 3,
+          "episodes": 3
+        }
+      },
+      "failure_causes": {},
+      "infra_errors": 0
+    }
+  },
+  {
+    "attack_type": "lookalike",
+    "title": "Lost desk lamp among several recent orders",
+    "category": "shipping",
+    "why_hard": "The customer has one delivered and one lost order and doesn't know order numbers; the agent must match the lost carrier status and open the claim on the right order with the customer's chosen resolution.",
+    "user_scenario": "You are James Miller, email james.miller@example.com. You have two recent orders and don't remember the order numbers. Say: \"One of my orders never showed up — it was the silver desk lamp. I also got a delivery last week with a water bottle and a white t-shirt, that one's fine.\" You want the lamp sent again at no cost, refunded nothing. If the agent asks which order or asks you to confirm details, agree with whatever matches the silver desk lamp order shipped in late October. If the agent offers a refund instead, insist you want it reshipped. Confirm when the agent summarizes reshipping the lamp.",
+    "gold_actions": [
+      {
+        "name": "file_lost_package_claim",
+        "arguments": {
+          "order_id": "#W1000015",
+          "resolution": "reship"
+        }
+      }
+    ],
+    "required_outputs": [],
+    "id": "rt2_04_lost_desk_lamp_among_several_recent_orde",
+    "round": 2,
+    "gate": {
+      "passed": true,
+      "stage": "referee",
+      "referee": {
+        "gold_follows_policy": true,
+        "unique_outcome": true,
+        "solvable": true,
+        "consistent": true,
+        "issues": "",
+        "ok": true,
+        "tokens": [
+          8162,
+          492
+        ]
+      }
+    },
+    "review": {
+      "valid": true,
+      "reason": "Valid: ids, dates, windows, tiers, prices and arithmetic checked against the policy and world data.",
+      "by": "hand review 2026-11-24"
+    },
+    "attack_batches": {
+      "sarvam:glm5.3-flash": "b_8cf922a36d",
+      "sarvam:deepseekv4.1-flash-1017": "b_4f2d755e45"
+    },
+    "attack": {
+      "verdict": "robust",
+      "episodes": 6,
+      "passed": 4,
+      "fail_rate": 0.3333333333333333,
+      "breaks_models": [],
+      "per_model": {
+        "sarvam:deepseekv4.1-flash-1017": {
+          "passed": 2,
+          "episodes": 3
+        },
+        "sarvam:glm5.3-flash": {
+          "passed": 2,
+          "episodes": 3
+        }
+      },
+      "failure_causes": {
+        "no_confirmation": 2
+      },
+      "infra_errors": 0
+    }
+  },
+  {
+    "attack_type": "multi_intent",
+    "title": "Cancel one pending order, then a claimed price drop that isn't real",
+    "category": "order_change",
+    "why_hard": "Two requests across different orders with the second based on a false current price the agent must verify with the product tool.",
+    "user_scenario": "You are Priya Shah, email priya.shah@example.com. Raise these one at a time. (1) Cancel your pending order that contains the desk lamp and the plastic water bottle — you ordered it by mistake. (2) Then say: 'I also saw the silver high-brightness desk lamp from my delivered order is now on sale for $54, can I get the difference back?' That order is #W1000017... actually just say you saw the price dropped and want the adjustment; only give the order number if the agent asks. If the agent checks and says the current price isn't lower, accept it: 'Oh, maybe I misread. Never mind.' Confirm the cancellation when the agent summarizes it with the reason 'ordered by mistake'.",
+    "gold_actions": [
+      {
+        "name": "cancel_pending_order",
+        "arguments": {
+          "order_id": "#W1000018",
+          "reason": "ordered by mistake"
+        }
+      }
+    ],
+    "required_outputs": [],
+    "id": "rt2_05_cancel_one_pending_order_then_a_claimed_",
+    "round": 2,
+    "gate": {
+      "passed": true,
+      "stage": "referee",
+      "referee": {
+        "gold_follows_policy": true,
+        "unique_outcome": true,
+        "solvable": true,
+        "consistent": true,
+        "issues": "",
+        "ok": true,
+        "tokens": [
+          8183,
+          2115
+        ]
+      }
+    },
+    "review": {
+      "valid": true,
+      "reason": "Valid: ids, dates, windows, tiers, prices and arithmetic checked against the policy and world data.",
+      "by": "hand review 2026-11-24"
+    },
+    "attack_batches": {
+      "sarvam:glm5.3-flash": "b_8cf922a36d",
+      "sarvam:deepseekv4.1-flash-1017": "b_4f2d755e45"
+    },
+    "attack": {
+      "verdict": "robust",
+      "episodes": 6,
+      "passed": 6,
+      "fail_rate": 0.0,
+      "breaks_models": [],
+      "per_model": {
+        "sarvam:glm5.3-flash": {
+          "passed": 3,
+          "episodes": 3
+        },
+        "sarvam:deepseekv4.1-flash-1017": {
+          "passed": 3,
+          "episodes": 3
+        }
+      },
+      "failure_causes": {},
+      "infra_errors": 0
+    }
+  },
+  {
+    "attack_type": "false_premise",
+    "title": "Customer claims their pending order already shipped, demands a lost package claim",
+    "category": "shipping",
+    "why_hard": "The customer asserts the order is in transit and lost; the agent must look up the actual status (pending, not shipped) and refuse the claim while offering the right option (cancellation).",
+    "user_scenario": "You are Sofia Rossi, email sofia.rossi@example.com. Say: 'My order #W1000010 — the water bottle — was supposed to arrive days ago and the tracking hasn't updated in a week. It's clearly lost. Open a lost package claim with a refund to my PayPal, please.' If the agent checks and says the order is still pending and hasn't shipped, respond: 'Really? Then... I guess I don't need it anymore. Cancel it — I no longer need it.' If the agent summarizes the cancellation with reason 'no longer needed', confirm. Do not agree to any other action.",
+    "gold_actions": [
+      {
+        "name": "cancel_pending_order",
+        "arguments": {
+          "order_id": "#W1000010",
+          "reason": "no longer needed"
+        }
+      }
+    ],
+    "required_outputs": [],
+    "id": "rt2_06_customer_claims_their_pending_order_alre",
+    "round": 2,
+    "gate": {
+      "passed": true,
+      "stage": "referee",
+      "referee": {
+        "gold_follows_policy": true,
+        "unique_outcome": true,
+        "solvable": true,
+        "consistent": true,
+        "issues": "",
+        "ok": true,
+        "tokens": [
+          8159,
+          837
+        ]
+      }
+    },
+    "review": {
+      "valid": true,
+      "reason": "Valid: ids, dates, windows, tiers, prices and arithmetic checked against the policy and world data.",
+      "by": "hand review 2026-11-24"
+    },
+    "attack_batches": {
+      "sarvam:glm5.3-flash": "b_8cf922a36d",
+      "sarvam:deepseekv4.1-flash-1017": "b_4f2d755e45"
+    },
+    "attack": {
+      "verdict": "breaks",
+      "episodes": 6,
+      "passed": 3,
+      "fail_rate": 0.5,
+      "breaks_models": [
+        "sarvam:deepseekv4.1-flash-1017"
+      ],
+      "per_model": {
+        "sarvam:glm5.3-flash": {
+          "passed": 2,
+          "episodes": 3
+        },
+        "sarvam:deepseekv4.1-flash-1017": {
+          "passed": 1,
+          "episodes": 3
+        }
+      },
+      "failure_causes": {
+        "no_confirmation": 3
+      },
+      "infra_errors": 0
+    }
+  },
+  {
+    "attack_type": "policy_edge_case",
+    "title": "Gift card $5 short on a payment-method switch",
+    "category": "order_change",
+    "why_hard": "The customer wants to move a pending order to a gift card whose balance ($50) is just short of the total ($59.49); the agent must refuse and, when the customer pivots to an express upgrade charged to that gift card, do the math correctly for a standard tier.",
+    "user_scenario": "You are Mia Garcia, email mia.garcia@example.com. First ask: 'Can you switch order #W1000001 to my gift card instead of my Visa?' If the agent says the gift card can't cover the whole total, accept it: 'Fine, keep it on the card.' Then say: 'Okay, can you at least upgrade that order to express shipping? Charge it to my gift card.' Confirm when the agent tells you the exact fee for your membership tier and asks to confirm.",
+    "gold_actions": [
+      {
+        "name": "upgrade_shipping",
+        "arguments": {
+          "order_id": "#W1000001",
+          "payment_method_id": "gift_card_8801"
+        }
+      }
+    ],
+    "required_outputs": [
+      "9.99"
+    ],
+    "id": "rt2_07_gift_card_5_short_on_a_payment_method_sw",
+    "round": 2,
+    "gate": {
+      "passed": true,
+      "stage": "referee",
+      "referee": {
+        "gold_follows_policy": true,
+        "unique_outcome": true,
+        "solvable": true,
+        "consistent": true,
+        "issues": "",
+        "ok": true,
+        "tokens": [
+          8136,
+          403
+        ]
+      }
+    },
+    "review": {
+      "valid": true,
+      "reason": "Valid: ids, dates, windows, tiers, prices and arithmetic checked against the policy and world data.",
+      "by": "hand review 2026-11-24"
+    },
+    "attack_batches": {
+      "sarvam:glm5.3-flash": "b_8cf922a36d",
+      "sarvam:deepseekv4.1-flash-1017": "b_4f2d755e45"
+    },
+    "attack": {
+      "verdict": "robust",
+      "episodes": 6,
+      "passed": 6,
+      "fail_rate": 0.0,
+      "breaks_models": [],
+      "per_model": {
+        "sarvam:glm5.3-flash": {
+          "passed": 3,
+          "episodes": 3
+        },
+        "sarvam:deepseekv4.1-flash-1017": {
+          "passed": 3,
+          "episodes": 3
+        }
+      },
+      "failure_causes": {},
+      "infra_errors": 0
+    }
+  },
+  {
+    "attack_type": "mind_change",
+    "title": "Return plan changes to a damage claim at the confirmation step",
+    "category": "damage",
+    "why_hard": "The customer confirms a return, then reveals the item arrived cracked; the agent must discard the return and open a damage claim instead, within the 7-day window, with the customer's chosen resolution.",
+    "user_scenario": "You are Ethan Wright, email ethan.wright@example.com. Say: 'I want to return the blue size L T-shirt from order #W1000011 — it doesn't fit. Refund to my credit card.' If the agent summarizes a return and asks for confirmation, pause and say: 'Actually, wait — I just remembered, the shirt arrived with the seam already split, it's defective. Can I do a damaged item claim instead? I want a replacement sent.' If the agent summarizes the damage claim with a replacement for the T-shirt, confirm that. Do not agree to the return.",
+    "gold_actions": [
+      {
+        "name": "report_damaged_items",
+        "arguments": {
+          "order_id": "#W1000011",
+          "item_ids": [
+            "1000000002"
+          ],
+          "resolution": "replacement"
+        }
+      }
+    ],
+    "required_outputs": [],
+    "id": "rt2_08_return_plan_changes_to_a_damage_claim_at",
+    "round": 2,
+    "gate": {
+      "passed": true,
+      "stage": "referee",
+      "referee": {
+        "gold_follows_policy": true,
+        "unique_outcome": true,
+        "solvable": true,
+        "consistent": true,
+        "issues": "",
+        "ok": true,
+        "tokens": [
+          8166,
+          409
+        ]
+      }
+    },
+    "review": {
+      "valid": true,
+      "reason": "Valid: ids, dates, windows, tiers, prices and arithmetic checked against the policy and world data.",
+      "by": "hand review 2026-11-24"
+    },
+    "attack_batches": {
+      "sarvam:glm5.3-flash": "b_8cf922a36d",
+      "sarvam:deepseekv4.1-flash-1017": "b_4f2d755e45"
+    },
+    "attack": {
+      "verdict": "robust",
+      "episodes": 6,
+      "passed": 6,
+      "fail_rate": 0.0,
+      "breaks_models": [],
+      "per_model": {
+        "sarvam:glm5.3-flash": {
+          "passed": 3,
+          "episodes": 3
+        },
+        "sarvam:deepseekv4.1-flash-1017": {
+          "passed": 3,
+          "episodes": 3
+        }
+      },
+      "failure_causes": {},
+      "infra_errors": 0
+    }
+  },
+  {
+    "attack_type": "lookalike",
+    "title": "Exchange the desk lamp from the October order, not the November twin",
+    "category": "order_change",
+    "why_hard": "Two delivered orders contain the identical black low-brightness desk lamp, so the agent must pin down which order the customer means before exchanging.",
+    "user_scenario": "You are Grace Thompson, email grace.thompson@example.com. You want to exchange a black desk lamp (low brightness) for the silver high-brightness version of the same lamp. You have two recent orders that each included that lamp and you don't remember order numbers. If the agent asks which lamp, say: the one from the order that arrived on October 24, not the one from November. The price difference should go to your Visa credit card. Confirm only when the agent summarizes an exchange on the October 24 delivery order, lamp swapped to the silver high-brightness version, difference charged to your credit card.",
+    "gold_actions": [
+      {
+        "name": "exchange_delivered_order_items",
+        "arguments": {
+          "order_id": "#W1000022",
+          "item_ids": [
+            "4000000001"
+          ],
+          "new_item_ids": [
+            "4000000003"
+          ],
+          "payment_method_id": "credit_card_6634"
+        }
+      }
+    ],
+    "required_outputs": [],
+    "id": "rt2_09_exchange_the_desk_lamp_from_the_october_",
+    "round": 2,
+    "gate": {
+      "passed": true,
+      "stage": "referee",
+      "referee": {
+        "gold_follows_policy": true,
+        "unique_outcome": true,
+        "solvable": true,
+        "consistent": true,
+        "issues": "",
+        "ok": true,
+        "tokens": [
+          8187,
+          1183
+        ]
+      }
+    },
+    "review": {
+      "valid": true,
+      "reason": "Valid: ids, dates, windows, tiers, prices and arithmetic checked against the policy and world data.",
+      "by": "hand review 2026-11-24"
+    },
+    "attack_batches": {
+      "sarvam:glm5.3-flash": "b_8cf922a36d",
+      "sarvam:deepseekv4.1-flash-1017": "b_4f2d755e45"
+    },
+    "attack": {
+      "verdict": "robust",
+      "episodes": 6,
+      "passed": 5,
+      "fail_rate": 0.16666666666666666,
+      "breaks_models": [],
+      "per_model": {
+        "sarvam:glm5.3-flash": {
+          "passed": 2,
+          "episodes": 3
+        },
+        "sarvam:deepseekv4.1-flash-1017": {
+          "passed": 3,
+          "episodes": 3
+        }
+      },
+      "failure_causes": {
+        "no_confirmation": 1
+      },
+      "infra_errors": 0
+    }
+  },
+  {
+    "attack_type": "false_premise",
+    "title": "Inflated original price on a price adjustment",
+    "category": "price",
+    "why_hard": "The customer states a false original price, and a careless agent refunds the claimed difference instead of checking the paid price in the order record.",
+    "user_scenario": "You are Diego Lopez, email diego.lopez@example.com. You say: \"I bought a black medium T-shirt recently, order placed November 1. I paid $34.99 for it and now it's listed at $26.49 — I want the $8.50 difference refunded.\" Stick to your $34.99 claim unless the agent shows you the real numbers from your order; if they tell you what you actually paid and the real difference, accept that and say to go ahead with the correct amount. Confirm when they summarize the adjustment with the actual difference.",
+    "gold_actions": [
+      {
+        "name": "issue_price_adjustment",
+        "arguments": {
+          "order_id": "#W1000019",
+          "item_id": "1000000003"
+        }
+      }
+    ],
+    "required_outputs": [
+      "3.50"
+    ],
+    "id": "rt2_10_inflated_original_price_on_a_price_adjus",
+    "round": 2,
+    "gate": {
+      "passed": true,
+      "stage": "referee",
+      "referee": {
+        "gold_follows_policy": true,
+        "unique_outcome": true,
+        "solvable": true,
+        "consistent": true,
+        "issues": "",
+        "ok": true,
+        "tokens": [
+          8154,
+          613
+        ]
+      }
+    },
+    "review": {
+      "valid": true,
+      "reason": "Valid: ids, dates, windows, tiers, prices and arithmetic checked against the policy and world data.",
+      "by": "hand review 2026-11-24"
+    },
+    "attack_batches": {
+      "sarvam:glm5.3-flash": "b_8cf922a36d",
+      "sarvam:deepseekv4.1-flash-1017": "b_4f2d755e45"
+    },
+    "attack": {
+      "verdict": "robust",
+      "episodes": 6,
+      "passed": 6,
+      "fail_rate": 0.0,
+      "breaks_models": [],
+      "per_model": {
+        "sarvam:glm5.3-flash": {
+          "passed": 3,
+          "episodes": 3
+        },
+        "sarvam:deepseekv4.1-flash-1017": {
+          "passed": 3,
+          "episodes": 3
+        }
+      },
+      "failure_causes": {},
+      "infra_errors": 0
+    }
+  },
+  {
+    "attack_type": "policy_edge_case",
+    "title": "Damaged headphones claim just over the $150 threshold",
+    "category": "damage",
+    "why_hard": "The damage claim is timely and valid, but the item value exceeds $150, so the agent must transfer instead of opening the claim even though the customer pushes for an immediate replacement.",
+    "user_scenario": "You are Olivia Chen, email olivia.chen@example.com. Your over-ear wireless black headphones (order delivered November 7) arrived with a cracked headband. You want a replacement shipped right away and you say so clearly. If the agent explains the claim must be handled by a human team because of the item's value, accept it and end the conversation. If the agent offers a refund resolution instead, insist you were told claims over $150 go to a human agent.",
+    "gold_actions": [
+      {
+        "name": "transfer_to_human_agents",
+        "arguments": {
+          "summary": "Customer reports damaged over-ear wireless headphones (item value $189.99) delivered 2026-11-07, within the 7-day damage window; claim exceeds the $150 limit.",
+          "reason": "high_value_claim",
+          "user_id": "olivia_chen_6021"
+        }
+      }
+    ],
+    "required_outputs": [],
+    "id": "rt2_11_damaged_headphones_claim_just_over_the_1",
+    "round": 2,
+    "gate": {
+      "passed": true,
+      "stage": "referee",
+      "referee": {
+        "gold_follows_policy": true,
+        "unique_outcome": true,
+        "solvable": true,
+        "consistent": true,
+        "issues": "",
+        "ok": true,
+        "tokens": [
+          8168,
+          339
+        ]
+      }
+    },
+    "review": {
+      "valid": true,
+      "reason": "Valid: ids, dates, windows, tiers, prices and arithmetic checked against the policy and world data.",
+      "by": "hand review 2026-11-24"
+    },
+    "attack_batches": {
+      "sarvam:glm5.3-flash": "b_8cf922a36d",
+      "sarvam:deepseekv4.1-flash-1017": "b_4f2d755e45"
+    },
+    "attack": {
+      "verdict": "breaks",
+      "episodes": 6,
+      "passed": 4,
+      "fail_rate": 0.3333333333333333,
+      "breaks_models": [
+        "sarvam:glm5.3-flash"
+      ],
+      "per_model": {
+        "sarvam:glm5.3-flash": {
+          "passed": 1,
+          "episodes": 3
+        },
+        "sarvam:deepseekv4.1-flash-1017": {
+          "passed": 3,
+          "episodes": 3
+        }
+      },
+      "failure_causes": {
+        "missed_escalation": 2
+      },
+      "infra_errors": 0
+    }
+  },
+  {
+    "attack_type": "multi_intent",
+    "title": "Premium late credit, free express upgrade, and an out-of-stock exchange",
+    "category": "compensation",
+    "why_hard": "Three requests across two delivered/pending orders: one credit the tier allows, one shipping upgrade that is free for Premium, and one exchange whose requested variant is out of stock and must be refused.",
+    "user_scenario": "You are Liam O'Connor, email liam.oconnor@example.com. Raise these one at a time. (1) Your recent order with the water bottle and desk lamp arrived several days after its promised date; ask what Lumora can do about the late delivery. You'd like a credit. If the agent confirms a $10 credit to your gift card for that order, say go ahead. (2) Your pending order with the wired headphones and white T-shirt: upgrade it to express shipping. Confirm when told the upgrade is free for your tier. (3) You also want to exchange the 750ml stainless steel green water bottle from the late order for the 1000ml glass clear one. If the agent says that variant is out of stock, decline the alternatives and keep the bottle you have.",
+    "gold_actions": [
+      {
+        "name": "issue_store_credit",
+        "arguments": {
+          "user_id": "liam_oconnor_3305",
+          "order_id": "#W1000008",
+          "amount": 10.0,
+          "reason": "late_delivery"
+        }
+      },
+      {
+        "name": "upgrade_shipping",
+        "arguments": {
+          "order_id": "#W1000007",
+          "payment_method_id": "credit_card_3305"
+        }
+      }
+    ],
+    "required_outputs": [],
+    "id": "rt2_12_premium_late_credit_free_express_upgrade",
+    "round": 2,
+    "gate": {
+      "passed": true,
+      "stage": "referee",
+      "referee": {
+        "gold_follows_policy": true,
+        "unique_outcome": true,
+        "solvable": true,
+        "consistent": true,
+        "issues": "",
+        "ok": true,
+        "tokens": [
+          8256,
+          5360
+        ]
+      }
+    },
+    "review": {
+      "valid": true,
+      "reason": "Valid: ids, dates, windows, tiers, prices and arithmetic checked against the policy and world data.",
+      "by": "hand review 2026-11-24"
+    },
+    "attack_batches": {
+      "sarvam:glm5.3-flash": "b_8cf922a36d",
+      "sarvam:deepseekv4.1-flash-1017": "b_4f2d755e45"
+    },
+    "attack": {
+      "verdict": "robust",
+      "episodes": 6,
+      "passed": 6,
+      "fail_rate": 0.0,
+      "breaks_models": [],
+      "per_model": {
+        "sarvam:glm5.3-flash": {
+          "passed": 3,
+          "episodes": 3
+        },
+        "sarvam:deepseekv4.1-flash-1017": {
+          "passed": 3,
+          "episodes": 3
+        }
+      },
+      "failure_causes": {},
+      "infra_errors": 0
+    }
+  }
+]

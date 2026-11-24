@@ -1,0 +1,10 @@
+.env
+node_modules/
+.next/
+__pycache__/
+.pytest_cache/
+*.pyc
+result_raw
+# private working logs
+CLAUDE.md
+RESULT[0-9].md
